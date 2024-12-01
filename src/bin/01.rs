@@ -17,14 +17,14 @@ pub fn lists(input: &str) -> (Vec<u32>, Vec<u32>) {
         list_2.push(entry_2);
     }
 
-    list_1.sort();
-    list_2.sort();
-
     (list_1, list_2)
 }
 
 pub fn part_one(input: &str) -> Option<u32> {
-    let (list_1, list_2) = lists(input);
+    let (mut list_1, mut list_2) = lists(input);
+
+    list_1.sort();
+    list_2.sort();
 
     let result: u32 = list_1
         .into_iter()
