@@ -3,7 +3,7 @@ use counter::Counter;
 advent_of_code::solution!(1);
 
 pub fn lists(input: &str) -> (Vec<u32>, Vec<u32>) {
-    let input_lns = input.trim_end().split("\n");
+    let input_lns = input.lines();
 
     let mut list_1 = vec![];
     let mut list_2 = vec![];
@@ -39,7 +39,7 @@ pub fn part_one(input: &str) -> Option<u32> {
                 .expect("result must be positive")
         })
         .collect::<Vec<_>>()
-        .into_iter()
+        .iter()
         .sum();
 
     Some(result)
@@ -60,7 +60,7 @@ pub fn part_two(input: &str) -> Option<u32> {
             score
         })
         .collect::<Vec<_>>()
-        .into_iter()
+        .iter()
         .sum();
 
     Some(result)
