@@ -147,12 +147,15 @@ pub fn part_one(input: &str) -> Option<u32> {
 
 pub fn part_two(input: &str) -> Option<u32> {
     let ParsedMap { start, map } = parsed_map(input);
+    let orig_path = trace_path(start, &map, None);
+
     let mut looped_obstructions = 0;
-    for (point, space) in map.iter() {
-        if *point == start || *space == Space::Obstruction {
+    for point in orig_path.visited {
+        let space = map.get(&point).expect("point guaranteed to be present in map");
+        if point == start || *space == Space::Obstruction {
             continue;
         }
-        let path = trace_path(start, &map, Some(*point));
+        let path = trace_path(start, &map, Some(point));
         if path.end_type == PathEnd::Cycle {
             looped_obstructions += 1;
         }
