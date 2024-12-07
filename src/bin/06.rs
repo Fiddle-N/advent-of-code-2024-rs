@@ -151,7 +151,9 @@ pub fn part_two(input: &str) -> Option<u32> {
 
     let mut looped_obstructions = 0;
     for point in orig_path.visited {
-        let space = map.get(&point).expect("point guaranteed to be present in map");
+        let space = map
+            .get(&point)
+            .expect("point guaranteed to be present in map");
         if point == start || *space == Space::Obstruction {
             continue;
         }
