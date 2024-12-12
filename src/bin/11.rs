@@ -4,7 +4,11 @@ advent_of_code::solution!(11);
 
 fn parse(input: &str) -> HashMap<u64, u64> {
     let mut stones = HashMap::new();
-    for stone in input.trim_end().split_whitespace().map(|x| x.parse().unwrap()) {
+    for stone in input
+        .trim_end()
+        .split_whitespace()
+        .map(|x| x.parse().unwrap())
+    {
         let count = stones.entry(stone).or_insert(0);
         *count += 1;
     }
@@ -21,7 +25,7 @@ fn solve_stone(num: u64) -> Vec<u64> {
         return vec![
             num_str[..half].parse().unwrap(),
             num_str[half..].parse().unwrap(),
-        ]
+        ];
     }
     vec![num * 2024]
 }
@@ -63,5 +67,4 @@ mod tests {
         let result = part_one(&advent_of_code::template::read_file("examples", DAY));
         assert_eq!(result, Some(55312));
     }
-
 }
