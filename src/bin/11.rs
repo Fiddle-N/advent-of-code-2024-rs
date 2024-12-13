@@ -31,8 +31,8 @@ fn solve_stone(num: u64) -> Vec<u64> {
 }
 
 fn solve_stones(mut nums: HashMap<u64, u64>, n: u64) -> u64 {
-    let mut new_nums = HashMap::new();
     for _ in 0..n {
+        let mut new_nums = HashMap::new();
         for (num, count) in nums.into_iter() {
             for new_num in solve_stone(num.try_into().expect("Fits into u64")) {
                 let new_count = new_nums.entry(new_num).or_insert(0);
@@ -40,7 +40,6 @@ fn solve_stones(mut nums: HashMap<u64, u64>, n: u64) -> u64 {
             }
         }
         nums = new_nums;
-        new_nums = HashMap::new();
     }
     nums.values().sum()
 }
