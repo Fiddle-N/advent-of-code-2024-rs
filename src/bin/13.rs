@@ -23,34 +23,36 @@ struct Machine {
 }
 
 fn parse(input: &str, prize_translation: i64) -> Vec<Machine> {
-    let mut machines = vec![];
-    for machine_data in input.trim_end().split("\n\n") {
-        let match_ = Regex::new(MACHINE_PATTERN)
-            .expect("Pattern should be valid")
-            .captures(machine_data)
-            .expect("Should match");
-        machines.push(Machine {
-            a: Point {
-                x: match_["a_x"].parse().expect("Should be i64 integer"),
-                y: match_["a_y"].parse().expect("Should be i64 integer"),
-            },
-            b: Point {
-                x: match_["b_x"].parse().expect("Should be i64 integer"),
-                y: match_["b_y"].parse().expect("Should be i64 integer"),
-            },
-            prize: Point {
-                x: match_["prize_x"]
-                    .parse::<i64>()
-                    .expect("Should be i64 integer")
-                    + prize_translation,
-                y: match_["prize_y"]
-                    .parse::<i64>()
-                    .expect("Should be i64 integer")
-                    + prize_translation,
-            },
-        });
-    }
-    machines
+    input
+        .trim_end()
+        .split("\n\n")
+        .map(|machine_data| {
+            let match_ = Regex::new(MACHINE_PATTERN)
+                .expect("Pattern should be valid")
+                .captures(machine_data)
+                .expect("Should match");
+            Machine {
+                a: Point {
+                    x: match_["a_x"].parse().expect("Should be i64 integer"),
+                    y: match_["a_y"].parse().expect("Should be i64 integer"),
+                },
+                b: Point {
+                    x: match_["b_x"].parse().expect("Should be i64 integer"),
+                    y: match_["b_y"].parse().expect("Should be i64 integer"),
+                },
+                prize: Point {
+                    x: match_["prize_x"]
+                        .parse::<i64>()
+                        .expect("Should be i64 integer")
+                        + prize_translation,
+                    y: match_["prize_y"]
+                        .parse::<i64>()
+                        .expect("Should be i64 integer")
+                        + prize_translation,
+                },
+            }
+        })
+        .collect()
 }
 
 /// Calculate the cost of pressing buttons to win the prize for each machine
@@ -97,41 +99,41 @@ fn parse(input: &str, prize_translation: i64) -> Vec<Machine> {
 /// Once we have the values of a and b, we can calculate the cost of pressing the buttons
 /// which is just 3 * a + b
 fn calc_costs(machines: Vec<Machine>) -> u64 {
-    let mut costs = 0;
-    for machine in machines {
-        let machine_a_x_i32: i32 = machine.a.x.try_into().expect("Fits into i32");
-        let machine_b_x_i32: i32 = machine.b.x.try_into().expect("Fits into i32");
-        let machine_a_y_i32: i32 = machine.a.y.try_into().expect("Fits into i32");
-        let machine_b_y_i32: i32 = machine.b.y.try_into().expect("Fits into i32");
-        let m_x = Rational32::new(-machine_a_x_i32, machine_b_x_i32);
-        let m_y = Rational32::new(-machine_a_y_i32, machine_b_y_i32);
-        if m_x == m_y {
-            panic!("Lines are parallel");
-        }
+    machines
+        .into_iter()
+        .filter_map(|machine| {
+            let machine_a_x_i32: i32 = machine.a.x.try_into().expect("Fits into i32");
+            let machine_b_x_i32: i32 = machine.b.x.try_into().expect("Fits into i32");
+            let machine_a_y_i32: i32 = machine.a.y.try_into().expect("Fits into i32");
+            let machine_b_y_i32: i32 = machine.b.y.try_into().expect("Fits into i32");
+            let m_x = Rational32::new(-machine_a_x_i32, machine_b_x_i32);
+            let m_y = Rational32::new(-machine_a_y_i32, machine_b_y_i32);
+            if m_x == m_y {
+                panic!("Lines are parallel");
+            }
 
-        let a_numer = machine.b.x * machine.prize.y - machine.b.y * machine.prize.x;
-        let a_denom = machine.b.x * machine.a.y - machine.a.x * machine.b.y;
-        if a_numer % a_denom != 0 {
-            // No solution for this machine
-            continue;
-        }
-        let a = a_numer / a_denom;
+            let a_numer = machine.b.x * machine.prize.y - machine.b.y * machine.prize.x;
+            let a_denom = machine.b.x * machine.a.y - machine.a.x * machine.b.y;
+            if a_numer % a_denom != 0 {
+                // No solution for this machine
+                return None;
+            }
+            let a = a_numer / a_denom;
 
-        let b_numer = machine.prize.x - machine.a.x * a;
-        let b_denom = machine.b.x;
-        if b_numer % b_denom != 0 {
-            // No solution for this machine
-            continue;
-        }
-        let b = b_numer / b_denom;
+            let b_numer = machine.prize.x - machine.a.x * a;
+            let b_denom = machine.b.x;
+            if b_numer % b_denom != 0 {
+                // No solution for this machine
+                return None;
+            }
+            let b = b_numer / b_denom;
 
-        let a: u64 = a.try_into().expect("Fits into u64");
-        let b: u64 = b.try_into().expect("Fits into u64");
+            let a: u64 = a.try_into().expect("Fits into u64");
+            let b: u64 = b.try_into().expect("Fits into u64");
 
-        let cost = 3 * a + b;
-        costs += cost;
-    }
-    costs
+            Some(3 * a + b)
+        })
+        .sum()
 }
 
 fn solve(input: &str, prize_translation: i64) -> u64 {
