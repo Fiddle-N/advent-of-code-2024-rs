@@ -25,6 +25,7 @@ dependencies = [
  "counter",
  "dhat",
  "itertools",
+ "num-bigint",
  "num-rational",
  "pico-args",
  "regex",
